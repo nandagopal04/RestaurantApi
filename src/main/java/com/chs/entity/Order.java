@@ -3,8 +3,8 @@ package com.chs.entity;
 import java.io.Serializable;
 import java.util.List;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -13,16 +13,19 @@ import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
 @Entity
-@Table(name="order")
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Table(name="orders")
+@Setter
+@Getter
+@ToString
+@EqualsAndHashCode
 public class Order implements Serializable{
+	
 	
 	/**
 	 * 
@@ -33,11 +36,11 @@ public class Order implements Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
-	@ManyToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name="customerId")
-	
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name="customer_id", nullable = false)
 	private Customer customer;
-	@ManyToMany(cascade = CascadeType.ALL)
+	
+	@ManyToMany
 	@JoinTable(
 			name="order_table",
 			joinColumns = @JoinColumn(name="order_id"),
@@ -45,16 +48,6 @@ public class Order implements Serializable{
 			)
 	private List<Item> listOfItems;
 	
-	private Double price = priceCalc(listOfItems);
-	
-	private Double priceCalc(List<Item> allItems) {
-		Double totalPrice = 0.0;
-		if(allItems != null) {
-			for(Item item : allItems) {
-				totalPrice += item.getPrice();
-			}
-		}
-		return totalPrice;
-	}
+	private Double price;
 
 }

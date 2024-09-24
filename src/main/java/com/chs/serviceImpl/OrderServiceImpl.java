@@ -6,15 +6,20 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.chs.dto.OrderDto;
 import com.chs.entity.Customer;
+import com.chs.entity.Item;
 import com.chs.entity.Order;
 import com.chs.exception.InvalidEntityDetailsException;
 import com.chs.repository.CustomerRepo;
 import com.chs.repository.OrderRepo;
 import com.chs.service.OrderService;
 
+import jakarta.transaction.Transactional;
+
+@Service
 public class OrderServiceImpl implements OrderService {
 
 	@Autowired
@@ -26,10 +31,26 @@ public class OrderServiceImpl implements OrderService {
 	@Autowired
 	private CustomerRepo customerRepo;
 
+	@Transactional
 	@Override
-	public OrderDto saveOrderDto(OrderDto orderDto) {
-		Order order = convertOrderDtoToOrderDto(orderDto);
+	public OrderDto saveOrderDto(OrderDto orderDto) throws InvalidEntityDetailsException {
+		System.out.println("@@@@ "+orderDto.getCustomer().getId());
+		Long custId=orderDto.getCustomer().getId();
+		Optional<Customer> optCustomer = customerRepo.findById(custId);
+		System.out.println("@@@@ cust"+optCustomer);
+
+		if(!optCustomer.isPresent()) {
+			throw new InvalidEntityDetailsException("Invalid Customer ID: "+orderDto.getCustomer().getId());
+		}
+		Order order = convertOrderDtoToOrder(orderDto);
+		System.out.println("@@@@ fff"+order.toString());
+
+		order.setPrice(priceCalc(orderDto.getListOfItems()));
+		System.out.println("@@@@ ttt"+order);
+
 		order = orderRepo.save(order);
+		System.out.println("@@@@ ggg"+order);
+
 		return convertOrderToOrderDto(order);
 	}
 
@@ -44,15 +65,17 @@ public class OrderServiceImpl implements OrderService {
 
 	@Override
 	public OrderDto editOrderDto(OrderDto orderDto) throws InvalidEntityDetailsException {
-		orderDto = findOrderById(orderDto.getId());
-		Order order = orderRepo.save(convertOrderDtoToOrderDto(orderDto));
+		findOrderById(orderDto.getId());
+		Order order = convertOrderDtoToOrder(orderDto);
+		order.setPrice(priceCalc(order.getListOfItems()));
+		order = orderRepo.save(order);
 		return convertOrderToOrderDto(order);
 	}
 
 	@Override
 	public OrderDto deleteOrderDto(Long id) throws InvalidEntityDetailsException {
 		OrderDto orderDto = findOrderById(id);
-		Order order = convertOrderDtoToOrderDto(orderDto);
+		Order order = convertOrderDtoToOrder(orderDto);
 		orderRepo.delete(order);
 		return orderDto;
 	}
@@ -77,8 +100,12 @@ public class OrderServiceImpl implements OrderService {
 		return modelMapper.map(order, OrderDto.class);
 	}
 
-	private Order convertOrderDtoToOrderDto(OrderDto orderDto) {
+	private Order convertOrderDtoToOrder(OrderDto orderDto) {
 		return modelMapper.map(orderDto, Order.class);
+	}
+	
+	private Double priceCalc(List<Item> items) {
+		return items.stream().mapToDouble(Item::getPrice).sum();
 	}
 
 }

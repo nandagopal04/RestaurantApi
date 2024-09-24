@@ -17,4 +17,5 @@ public interface CustomerService {
 
 	CustomerDto deleteCustomer(Long id) throws InvalidEntityDetailsException;
 
+	public CustomerDto findCustomerByPhoneNumber(Long phoneNumber) throws InvalidEntityDetailsException;
 }

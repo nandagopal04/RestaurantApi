@@ -2,17 +2,21 @@ package com.chs.dto;
 
 import java.util.List;
 
-import org.springframework.stereotype.Component;
+import com.chs.entity.Customer;
+import com.chs.entity.Item;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.ToString;
 
-@Data
-@Component
+@Setter
+@Getter
+@ToString
 public class OrderDto {
 
 	private Long id;
-	private CustomerDto customerDto;
-	private List<ItemDto> listOfItemsDto;
+	private Customer customer;
+	private List<Item> listOfItems;
 	private Double price;
 	
 }

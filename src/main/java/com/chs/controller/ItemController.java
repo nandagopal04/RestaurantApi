@@ -12,47 +12,47 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import com.chs.dto.ItemDto;
 import com.chs.exception.InvalidEntityDetailsException;
-import com.chs.serviceImpl.ItemServiceImpl;
+import com.chs.service.ItemService;
 
-import io.swagger.v3.oas.annotations.parameters.RequestBody;
 
 @RestController
 @RequestMapping("/item")
 public class ItemController {
 
 	@Autowired
-	private ItemServiceImpl itemServiceImpl;
+	private ItemService itemService;
 	
 	@PostMapping("/create")
 	public ResponseEntity<ItemDto> createItem(@RequestBody ItemDto itemDto){
-		ItemDto savedItemDto = itemServiceImpl.saveItem(itemDto);
+		ItemDto savedItemDto = itemService.saveItem(itemDto);
 		return new ResponseEntity<ItemDto>(savedItemDto, HttpStatus.CREATED);
 	}
 	
 	@GetMapping("/get/{id}")
 	public ResponseEntity<ItemDto> findItemById(@PathVariable Long id) throws InvalidEntityDetailsException{
-		ItemDto itemDto = itemServiceImpl.findItemById(id);
+		ItemDto itemDto = itemService.findItemById(id);
 		return new ResponseEntity<ItemDto>(itemDto, HttpStatus.OK);
 	}
 	
 	@GetMapping("/get/all")
 	public ResponseEntity<List<ItemDto>> findAllItems(){
-		List<ItemDto> allItemDtos = itemServiceImpl.findAllItems();
+		List<ItemDto> allItemDtos = itemService.findAllItems();
 		return new ResponseEntity<List<ItemDto>>(allItemDtos, HttpStatus.OK);
 	}
 	
 	@PutMapping("/update")
 	public ResponseEntity<ItemDto> updateItem(@RequestBody ItemDto itemDto) throws InvalidEntityDetailsException{
-		ItemDto editedItemDto = itemServiceImpl.editItem(itemDto);
+		ItemDto editedItemDto = itemService.editItem(itemDto);
 		return new ResponseEntity<ItemDto>(editedItemDto, HttpStatus.OK);
 	}
 	
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity<ItemDto> deleteItem(@PathVariable Long id) throws InvalidEntityDetailsException{
-		ItemDto itemDto = itemServiceImpl.deleteItem(id);
+		ItemDto itemDto = itemService.deleteItem(id);
 		return new ResponseEntity<ItemDto>(itemDto, HttpStatus.OK);
 	}
 	

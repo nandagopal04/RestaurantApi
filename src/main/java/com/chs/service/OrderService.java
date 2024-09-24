@@ -7,7 +7,7 @@ import com.chs.dto.OrderDto;
 
 public interface OrderService {
 
-	OrderDto saveOrderDto(OrderDto orderDto);
+	OrderDto saveOrderDto(OrderDto orderDto) throws InvalidEntityDetailsException;
 
 	OrderDto findOrderById(Long id) throws InvalidEntityDetailsException;
 

@@ -1,9 +1,9 @@
 package com.chs.entity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,13 +12,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
 @Entity
 @Table(name="customer")
-@Data
+@Setter
+@Getter
+@ToString
+@EqualsAndHashCode
 @AllArgsConstructor
 @NoArgsConstructor
 public class Customer implements Serializable{
@@ -33,8 +38,9 @@ public class Customer implements Serializable{
 	private String name;
 	private Long phoneNumber;
 	private String email;
-	@OneToMany(mappedBy = "customer")
+	@OneToMany(mappedBy = "customer", targetEntity = com.chs.entity.Order.class)
 	@ToString.Exclude
-	private List<Order> allOrdersofCustomer = new ArrayList<Order>();
+	@JsonIgnore
+	private List<Order> allOrdersofCustomer;
 	
 }

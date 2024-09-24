@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.chs.dto.ItemDto;
 import com.chs.entity.Item;
@@ -13,6 +14,7 @@ import com.chs.exception.InvalidEntityDetailsException;
 import com.chs.repository.ItemRepo;
 import com.chs.service.ItemService;
 
+@Service
 public class ItemServiceImpl implements ItemService {
 
 	@Autowired
@@ -23,9 +25,11 @@ public class ItemServiceImpl implements ItemService {
 	
 	@Override
 	public ItemDto saveItem(ItemDto itemDto) {
+		System.out.println(itemDto);
 		Item item = convertItemDtoToItem(itemDto);
-		item = itemRepo.save(item);
-		return convertItemToItemDto(item);
+		System.out.println(item);
+		Item savedItem = itemRepo.save(item);
+		return convertItemToItemDto(savedItem);
 	}
 
 	@Override
@@ -48,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public ItemDto editItem(ItemDto itemDto) throws InvalidEntityDetailsException {
-		itemDto = findItemById(itemDto.getId());
+		findItemById(itemDto.getId());
 		Item item = itemRepo.save(convertItemDtoToItem(itemDto));
 		return convertItemToItemDto(item);
 	}
@@ -59,7 +63,7 @@ public class ItemServiceImpl implements ItemService {
 		itemRepo.delete(convertItemDtoToItem(itemDto));
 		return itemDto;
 	}
-
+	
 	private Item convertItemDtoToItem(ItemDto itemDto) {
 		return modelMapper.map(itemDto, Item.class);
 	}

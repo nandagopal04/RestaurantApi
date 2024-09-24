@@ -1,11 +1,13 @@
 package com.chs.serviceImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.chs.dto.CustomerDto;
 import com.chs.entity.Customer;
@@ -13,6 +15,7 @@ import com.chs.exception.InvalidEntityDetailsException;
 import com.chs.repository.CustomerRepo;
 import com.chs.service.CustomerService;
 
+@Service
 public class CustomerServiceImpl implements CustomerService{
 
 	@Autowired
@@ -51,7 +54,10 @@ public class CustomerServiceImpl implements CustomerService{
 
 	@Override
 	public CustomerDto editCustomer(CustomerDto customerDto) throws InvalidEntityDetailsException {
-		customerDto = findCustomerById(customerDto.getId());
+//		customerDto = findCustomerById(customerDto.getId());
+		if(!customerRepo.existsById(customerDto.getId())) {
+			throw new InvalidEntityDetailsException("Invalid customer ID: "+customerDto.getId());
+		}
 		Customer customer = customerRepo.save(convertCustomerDtoToCustomer(customerDto));
 		return convertCustomerToCustomerDto(customer);
 	}
@@ -61,6 +67,18 @@ public class CustomerServiceImpl implements CustomerService{
 		CustomerDto customerDto = findCustomerById(id);
 		customerRepo.delete(convertCustomerDtoToCustomer(customerDto));
 		return customerDto;
+	}
+	
+	@Override
+	public CustomerDto findCustomerByPhoneNumber(Long phoneNumber) throws InvalidEntityDetailsException {
+		List<Customer> allCustomers = new ArrayList<Customer>();
+		allCustomers = customerRepo.findAll();
+		for(Customer customer : allCustomers) {
+			if(customer.getPhoneNumber().equals(phoneNumber)) {
+				return convertCustomerToCustomerDto(customer);
+			}
+		}
+		throw new InvalidEntityDetailsException("Phone Number provided: " + phoneNumber + " doesn't exist");
 	}
 	
 	private CustomerDto convertCustomerToCustomerDto(Customer customer) {
